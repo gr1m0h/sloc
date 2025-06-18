@@ -1,7 +1,6 @@
 import { Command } from "commander";
 import { parseCsvFile } from "../utils/csvParser";
-import { calculateSloAndErrorBudget } from "../utils/calculator";
-import { CommonCommandOptions } from "../types";
+import { calculateSLOAndErrorBudget } from "../utils/calculator";
 
 export function registerCalculateCommand(program: Command) {
   program
@@ -34,7 +33,7 @@ export function registerCalculateCommand(program: Command) {
           process.exit(1);
         }
 
-        const result = calculateSloAndErrorBudget(events, targetSLO);
+        const result = calculateSLOAndErrorBudget(events, targetSLO);
 
         console.log("\n--- SLO/Error Budget Calculation Results ---");
         console.log(`Target SLO:                 ${result.slo}%`);

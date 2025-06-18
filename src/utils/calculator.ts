@@ -1,4 +1,3 @@
-import { argv0 } from "process";
 import { EventData, CalculationResult } from "../types";
 
 export function calculateSLI(goodEvents: number, totalEvents: number): number {
@@ -8,7 +7,7 @@ export function calculateSLI(goodEvents: number, totalEvents: number): number {
   return (goodEvents / totalEvents) * 100;
 }
 
-export function calculateSloAndErrorBudget(
+export function calculateSLOAndErrorBudget(
   events: EventData[],
   targetSLO: number,
 ): CalculationResult {
