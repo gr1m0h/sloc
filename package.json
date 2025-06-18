@@ -1,0 +1,23 @@
+{
+  "name": "sloc",
+  "version": "1.0.0",
+  "description": "CLI tool for calculating SLO and Error Budget.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch & node --watch dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/commander": "^2.12.0",
+    "@types/csv-parse": "^1.1.12",
+    "@types/node": "^24.0.3",
+    "commander": "^14.0.0",
+    "csv-parse": "^5.6.0",
+    "typescript": "^5.8.3"
+  }
+}
