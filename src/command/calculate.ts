@@ -15,12 +15,12 @@ export function registerCalculateCommand(program: Command) {
       "Target SLO percentage (e.g., 99.9). Defaults to 99.9.",
       "99.9",
     )
-    .action(async (options: { csvFile: string; targetSLO: string }) => {
+    .action(async (options: { csvFile: string; targetSlo: string }) => {
       try {
-        const targetSLO = parseFloat(options.targetSLO);
-        if (isNaN(targetSLO) || targetSLO <= 0 || targetSLO >= 100) {
+        const targetSLO = parseFloat(options.targetSlo);
+        if (isNaN(targetSLO) || targetSLO < 0 || targetSLO > 100) {
           console.error(
-            "Error: Target SLO must be a number between 0 and 100 (exclusive).",
+            "Error: Target SLO must be a number between 0 and 100 (inclusive).",
           );
           process.exit(1);
         }
