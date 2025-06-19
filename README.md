@@ -70,6 +70,7 @@ Options:
 - `-t, --target-slo <percentage>`: (Optional) Target SLO percentage (default is 99.9).
 - `--start-date <date>`: (Optional) Start date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).
 - `--end-date <date>`: (Optional) End date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).
+- `--exclude-dates <dates>`: (Optional) Comma-separated list of dates to exclude from calculation (YYYY-MM-DD format). Useful for removing incident days while maintaining the time frame.
 
 Examples:
 
@@ -82,6 +83,12 @@ sloc calculate -f events.csv -t 99.9 --start-date "2024-01-01" --end-date "2024-
 
 # Filter with specific time range
 sloc calculate -f events.csv -t 99.9 --start-date "2024-01-01 00:00:00" --end-date "2024-01-01 23:59:59"
+
+# Exclude specific dates (e.g., during incidents)
+sloc calculate -f events.csv -t 99.9 --exclude-dates "2024-01-15,2024-01-20"
+
+# Combine date range filtering with date exclusion
+sloc calculate -f events.csv -t 99.9 --start-date "2024-01-01" --end-date "2024-01-31" --exclude-dates "2024-01-15"
 ```
 
 ## Output Explanation

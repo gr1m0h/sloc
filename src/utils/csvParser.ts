@@ -2,7 +2,7 @@ import { createReadStream } from "fs";
 import { parse } from "csv-parse";
 import { EventData } from "../types";
 
-export async function parseCsvFile(filePath: string, startDate?: Date, endDate?: Date): Promise<EventData[]> {
+export async function parseCsvFile(filePath: string, startDate?: Date, endDate?: Date, excludeDates?: Date[]): Promise<EventData[]> {
   const records: EventData[] = [];
   const parser = createReadStream(filePath).pipe(
     parse({
@@ -31,6 +31,17 @@ export async function parseCsvFile(filePath: string, startDate?: Date, endDate?:
 
     if (endDate && timestamp > endDate) {
       continue;
+    }
+
+    if (excludeDates && excludeDates.length > 0) {
+      const eventDate = new Date(timestamp.getFullYear(), timestamp.getMonth(), timestamp.getDate());
+      const isExcluded = excludeDates.some(excludeDate => {
+        const excludeDateOnly = new Date(excludeDate.getFullYear(), excludeDate.getMonth(), excludeDate.getDate());
+        return eventDate.getTime() === excludeDateOnly.getTime();
+      });
+      if (isExcluded) {
+        continue;
+      }
     }
 
     records.push({

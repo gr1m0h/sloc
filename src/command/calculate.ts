@@ -23,7 +23,11 @@ export function registerCalculateCommand(program: Command) {
       "--end-date <date>",
       "End date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).",
     )
-    .action(async (options: { csvFile: string; targetSlo: string; startDate?: string; endDate?: string }) => {
+    .option(
+      "--exclude-dates <dates>",
+      "Comma-separated list of dates to exclude from calculation (YYYY-MM-DD format).",
+    )
+    .action(async (options: { csvFile: string; targetSlo: string; startDate?: string; endDate?: string; excludeDates?: string }) => {
       try {
         const targetSLO = parseFloat(options.targetSlo);
         if (isNaN(targetSLO) || targetSLO < 0 || targetSLO > 100) {
@@ -57,7 +61,19 @@ export function registerCalculateCommand(program: Command) {
           process.exit(1);
         }
 
-        const events = await parseCsvFile(options.csvFile, startDate, endDate);
+        let excludeDates: Date[] = [];
+        if (options.excludeDates) {
+          excludeDates = options.excludeDates.split(",").map(dateStr => {
+            const date = new Date(dateStr.trim());
+            if (isNaN(date.getTime())) {
+              console.error(`Error: Invalid exclude date format: ${dateStr.trim()}. Use YYYY-MM-DD.`);
+              process.exit(1);
+            }
+            return date;
+          });
+        }
+
+        const events = await parseCsvFile(options.csvFile, startDate, endDate, excludeDates);
         if (events.length === 0) {
           console.error(
             "Error: No valid event data found n the CSV file. Please check the file format.",
@@ -68,6 +84,9 @@ export function registerCalculateCommand(program: Command) {
         const result = calculateSLOAndErrorBudget(events, targetSLO);
 
         console.log("\n--- SLO/Error Budget Calculation Results ---");
+        if (excludeDates.length > 0) {
+          console.log(`Excluded dates:             ${excludeDates.map(d => d.toISOString().split('T')[0]).join(', ')}`);
+        }
         console.log(`Target SLO:                 ${result.slo}%`);
         console.log(`Total Events:               ${result.totalEvents}`);
         console.log(`Total Good Events:          ${result.totalGoodEvents}`);

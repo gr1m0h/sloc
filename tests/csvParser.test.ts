@@ -94,6 +94,61 @@ describe('csvParser', () => {
     });
   });
 
+  describe('parseCsvFile with exclude dates', () => {
+    it('should exclude events from specified dates', async () => {
+      const excludeDates = [new Date('2024-01-02 00:00:00')];
+      const events = await parseCsvFile(testCsvPath, undefined, undefined, excludeDates);
+      
+      expect(events).toHaveLength(4);
+      // Should exclude all events from 2024-01-02
+      expect(events.every(event => 
+        event.timestamp.toDateString() !== new Date('2024-01-02').toDateString()
+      )).toBe(true);
+      
+      // Should include events from other dates
+      expect(events.some(event => 
+        event.timestamp.toDateString() === new Date('2024-01-01').toDateString()
+      )).toBe(true);
+      expect(events.some(event => 
+        event.timestamp.toDateString() === new Date('2024-01-03').toDateString()
+      )).toBe(true);
+    });
+
+    it('should exclude events from multiple specified dates', async () => {
+      const excludeDates = [
+        new Date('2024-01-01 00:00:00'),
+        new Date('2024-01-03 00:00:00')
+      ];
+      const events = await parseCsvFile(testCsvPath, undefined, undefined, excludeDates);
+      
+      expect(events).toHaveLength(2);
+      // Should only include events from 2024-01-02
+      expect(events.every(event => 
+        event.timestamp.toDateString() === new Date('2024-01-02').toDateString()
+      )).toBe(true);
+    });
+
+    it('should work with date range filtering and exclude dates', async () => {
+      const startDate = new Date('2024-01-01 00:00:00');
+      const endDate = new Date('2024-01-03 23:59:59');
+      const excludeDates = [new Date('2024-01-02 00:00:00')];
+      const events = await parseCsvFile(testCsvPath, startDate, endDate, excludeDates);
+      
+      expect(events).toHaveLength(4);
+      // Should exclude 2024-01-02 but include 2024-01-01 and 2024-01-03
+      expect(events.every(event => 
+        event.timestamp.toDateString() !== new Date('2024-01-02').toDateString()
+      )).toBe(true);
+    });
+
+    it('should return all events when exclude dates is empty', async () => {
+      const excludeDates: Date[] = [];
+      const events = await parseCsvFile(testCsvPath, undefined, undefined, excludeDates);
+      
+      expect(events).toHaveLength(6);
+    });
+  });
+
   describe('error handling', () => {
     it('should handle malformed CSV gracefully', async () => {
       const malformedCsvPath = path.join(testCsvDir, 'malformed.csv');
