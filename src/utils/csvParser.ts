@@ -17,8 +17,8 @@ export async function parseCsvFile(filePath: string): Promise<EventData[]> {
       continue;
     }
     const timestamp = new Date(record[0]);
-    const goodEvents = parseInt(record[1], 10);
-    const badEvents = parseInt(record[2], 10);
+    const goodEvents = parseFloat(record[1]);
+    const badEvents = parseFloat(record[2]);
 
     if (isNaN(timestamp.getTime()) || isNaN(goodEvents) || isNaN(badEvents)) {
       console.warn(`Skipping row with invalid data: ${record.join(",")}`);
