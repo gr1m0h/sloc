@@ -15,7 +15,15 @@ export function registerCalculateCommand(program: Command) {
       "Target SLO percentage (e.g., 99.9). Defaults to 99.9.",
       "99.9",
     )
-    .action(async (options: { csvFile: string; targetSlo: string }) => {
+    .option(
+      "--start-date <date>",
+      "Start date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).",
+    )
+    .option(
+      "--end-date <date>",
+      "End date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).",
+    )
+    .action(async (options: { csvFile: string; targetSlo: string; startDate?: string; endDate?: string }) => {
       try {
         const targetSLO = parseFloat(options.targetSlo);
         if (isNaN(targetSLO) || targetSLO < 0 || targetSLO > 100) {
@@ -25,7 +33,31 @@ export function registerCalculateCommand(program: Command) {
           process.exit(1);
         }
 
-        const events = await parseCsvFile(options.csvFile);
+        let startDate: Date | undefined;
+        let endDate: Date | undefined;
+
+        if (options.startDate) {
+          startDate = new Date(options.startDate);
+          if (isNaN(startDate.getTime())) {
+            console.error("Error: Invalid start date format. Use YYYY-MM-DD or YYYY-MM-DD HH:mm:ss.");
+            process.exit(1);
+          }
+        }
+
+        if (options.endDate) {
+          endDate = new Date(options.endDate);
+          if (isNaN(endDate.getTime())) {
+            console.error("Error: Invalid end date format. Use YYYY-MM-DD or YYYY-MM-DD HH:mm:ss.");
+            process.exit(1);
+          }
+        }
+
+        if (startDate && endDate && startDate >= endDate) {
+          console.error("Error: Start date must be before end date.");
+          process.exit(1);
+        }
+
+        const events = await parseCsvFile(options.csvFile, startDate, endDate);
         if (events.length === 0) {
           console.error(
             "Error: No valid event data found n the CSV file. Please check the file format.",

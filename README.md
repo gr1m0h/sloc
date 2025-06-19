@@ -68,11 +68,20 @@ Options:
 
 - `-f, --csv-file <file>`: (Required) Path to the CSV file containing event data.
 - `-t, --target-slo <percentage>`: (Optional) Target SLO percentage (default is 99.9).
+- `--start-date <date>`: (Optional) Start date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).
+- `--end-date <date>`: (Optional) End date for filtering (YYYY-MM-DD or YYYY-MM-DD HH:mm:ss format).
 
-Example:
+Examples:
 
 ```bash
+# Basic usage
 sloc calculate -f events.csv -t 99.9
+
+# Filter data for a specific date range
+sloc calculate -f events.csv -t 99.9 --start-date "2024-01-01" --end-date "2024-01-31"
+
+# Filter with specific time range
+sloc calculate -f events.csv -t 99.9 --start-date "2024-01-01 00:00:00" --end-date "2024-01-01 23:59:59"
 ```
 
 ## Output Explanation

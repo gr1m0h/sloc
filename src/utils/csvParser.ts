@@ -2,7 +2,7 @@ import { createReadStream } from "fs";
 import { parse } from "csv-parse";
 import { EventData } from "../types";
 
-export async function parseCsvFile(filePath: string): Promise<EventData[]> {
+export async function parseCsvFile(filePath: string, startDate?: Date, endDate?: Date): Promise<EventData[]> {
   const records: EventData[] = [];
   const parser = createReadStream(filePath).pipe(
     parse({
@@ -22,6 +22,14 @@ export async function parseCsvFile(filePath: string): Promise<EventData[]> {
 
     if (isNaN(timestamp.getTime()) || isNaN(goodEvents) || isNaN(badEvents)) {
       console.warn(`Skipping row with invalid data: ${record.join(",")}`);
+      continue;
+    }
+
+    if (startDate && timestamp < startDate) {
+      continue;
+    }
+
+    if (endDate && timestamp > endDate) {
       continue;
     }
 
