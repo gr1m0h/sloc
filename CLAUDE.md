@@ -2,53 +2,40 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Common Development Commands
 
-This is a TypeScript CLI tool called "sloc" for calculating Service Level Objectives (SLO) and Error Budget metrics from CSV event data. The tool processes event data containing timestamps, good events, and bad events to calculate reliability metrics.
+**Build and Run:**
+- `npm run build` - Compile TypeScript to JavaScript in dist/ directory
+- `npm start` - Run the built CLI tool
+- `npm run dev` - Watch mode for development (rebuild on changes)
 
-## Development Commands
+**Testing:**
+- `npm test` - Run all tests with Jest
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
 
-- **Build**: `npm run build` - Compiles TypeScript to `dist/` directory
-- **Start**: `npm run start` - Runs the compiled CLI from `dist/index.js`
-- **Development**: `npm run dev` - Runs TypeScript compiler in watch mode with node --watch
-- **Test**: Currently no tests configured (test script exits with error)
+## Project Architecture
 
-## CLI Usage
+**Core Structure:**
+- `src/index.ts` - Entry point that sets up and parses CLI
+- `src/cli.ts` - CLI configuration using Commander.js
+- `src/command/calculate.ts` - Main calculate command implementation with date filtering
+- `src/utils/calculator.ts` - SLO/Error Budget calculation logic
+- `src/utils/csvParser.ts` - CSV parsing with date filtering support
+- `src/types.ts` - TypeScript interfaces for EventData and CalculationResult
 
-The main command is `calculate` which processes CSV files:
-```bash
-node dist/index.js calculate -f <csv-file> [-t <target-slo>]
-```
+**Key Concepts:**
+- EventData contains timestamp, goodEvents, and badEvents from CSV input
+- CalculationResult provides comprehensive SLO metrics including SLI, error budget, and remaining budget
+- Date filtering supports start/end dates and exclude-dates for incident handling
+- CSV format: timestamp,goodEvents,badEvents (no headers)
 
-- `-f, --csv-file`: Required path to CSV file with event data
-- `-t, --target-slo`: Optional target SLO percentage (default: 99.9)
+**Command Pattern:**
+- Commands are registered in `cli.ts` via `registerCalculateCommand()`
+- Each command module exports a registration function that adds the command to Commander
+- Command options include file path, target SLO, and date filtering parameters
 
-## Architecture
-
-The codebase follows a modular structure:
-
-- **Entry Point**: `src/index.ts` - Sets up and runs the CLI
-- **CLI Setup**: `src/cli.ts` - Configures Commander.js program and registers commands
-- **Commands**: `src/command/` - Individual CLI command implementations
-- **Utilities**: `src/utils/` - Core business logic modules
-  - `calculator.ts` - SLO/SLI calculation algorithms
-  - `csvParser.ts` - CSV file parsing with validation
-- **Types**: `src/types.ts` - TypeScript interfaces for EventData and CalculationResult
-
-## CSV Data Format
-
-Expected CSV format (no headers):
-```
-timestamp,goodEvents,badEvents
-2024-01-01 00:00:00,1000,10
-```
-
-The parser validates data types and skips malformed rows with warnings.
-
-## Key Calculations
-
-- **SLI (Service Level Indicator)**: (Good Events / Total Events) × 100
-- **Error Budget**: (100 - Target SLO) × Total Events
-- **Remaining Error Budget**: Error Budget - Bad Events
-
-Results are displayed with 4 decimal places for percentages and 2 for event counts.
+**Testing:**
+- Tests are in `tests/` directory using Jest with ts-jest preset
+- Coverage excludes entry points (index.ts, cli.ts)
+- Test structure covers units (calculator, csvParser) and CLI integration
